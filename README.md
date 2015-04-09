@@ -1,0 +1,2 @@
+# ZeroBundle
+Packed ZeroNet dependecies

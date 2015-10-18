@@ -37,7 +37,8 @@ def getDir(url):
 
 
 if __name__ == "__main__":
-	url, script = sys.argv[1:]
+	url = sys.argv[1]
+	script = " ".join(sys.argv[2:])
 	target_dir = getDir(url)
 	if "github.com" in url and ".zip" not in url: # Download master brach from github
 		url += "/archive/master.zip"
@@ -45,4 +46,4 @@ if __name__ == "__main__":
 		download(url, target_dir)
 	print "Starting %s/%s..." % (target_dir, script)
 	os.chdir(target_dir)
-	os.execv("../Python/python.exe", ["../Python/python.exe", '"%s"' % script])
+	os.execv("../Python/python.exe", ["../Python/python.exe", '%s' % script])

@@ -46,4 +46,4 @@ if __name__ == "__main__":
         download(url, target_dir)
     print "Starting %s/%s..." % (target_dir, script)
     os.chdir(target_dir)
-    os.execv("../Python/python.exe", ["../Python/python.exe", '%s' % script])
+    os.execv("../Python/python", ["../Python/python", '%s' % script.strip("\"'")])

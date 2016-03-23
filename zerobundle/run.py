@@ -1,9 +1,30 @@
 import urllib, zipfile, os,  re, sys
 import cStringIO as StringIO
 
+# Request https SSL error workaround
+def httpRequest(url, as_file=False):
+    if url.startswith("http://"):
+        import urllib
+        response = urllib.urlopen(url)
+    else:  # Hack to avoid Python gevent ssl errors
+        import socket
+        import httplib
+        import ssl
+
+        host, request = re.match("https://(.*?)(/.*?)$", url).groups()
+
+        conn = httplib.HTTPSConnection(host)
+        sock = socket.create_connection((conn.host, conn.port), conn.timeout, conn.source_address)
+        conn.sock = ssl.wrap_socket(sock, conn.key_file, conn.cert_file)
+        conn.request("GET", request)
+        response = conn.getresponse()
+        if response.status in [301, 302, 303, 307, 308]:
+            response = httpRequest(response.getheader('Location'))
+    return response
+
 def download(url, target_dir):
     print "Downloading %s to %s directory." % (url, target_dir)
-    file = urllib.urlopen(url)
+    file = httpRequest(url)
     data = StringIO.StringIO()
     while True:
         buff = file.read(1024*16)

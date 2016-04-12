@@ -8,4 +8,4 @@ Packed ZeroNet dependencies for Windows: Python 2.7.9 + ZeroMQ, Greenlet, Gevent
 
 It downloads the latest version of ZeroNet, then starts it automatically.
 
-If it doesn't work please try the normal install method: http://zeronet.readthedocs.org/en/latest/getting_started/installing/
+If it doesn't work please try the normal install method: http://zeronet.readthedocs.org/en/latest/using_zeronet/installing/

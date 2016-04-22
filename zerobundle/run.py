@@ -1,5 +1,9 @@
-import urllib, zipfile, os,  re, sys
+import zipfile
+import os
+import re
+import sys
 import cStringIO as StringIO
+
 
 # Request https SSL error workaround
 def httpRequest(url, as_file=False):
@@ -22,13 +26,15 @@ def httpRequest(url, as_file=False):
             response = httpRequest(response.getheader('Location'))
     return response
 
+
 def download(url, target_dir):
     print "Downloading %s to %s directory." % (url, target_dir)
     file = httpRequest(url)
     data = StringIO.StringIO()
     while True:
-        buff = file.read(1024*16)
-        if not buff: break
+        buff = file.read(1024 * 16)
+        if not buff:
+            break
         data.write(buff)
         print ".",
     print "Downloaded."
@@ -36,10 +42,16 @@ def download(url, target_dir):
     print "Extracting...",
     zip = zipfile.ZipFile(data)
     for inner_path in zip.namelist():
-        inner_path = inner_path.replace("\\", "/") # Make sure we have unix path
+        inner_path = inner_path.replace("\\", "/")  # Make sure we have unix path
         print ".",
-        dest_path = re.sub("^[^/]*-master/", target_dir+"/", inner_path) # Change -master dir with target_dir
-        if not dest_path: continue
+        dest_path = re.sub("^[^/]*-master.*?/", target_dir + "/", inner_path)  # Change -master dir with target_dir
+        if target_dir not in dest_path:
+            dest_path = target_dir+"/"+dest_path
+
+        if ".." in dest_path:
+            continue
+        if not dest_path:
+            continue
 
         dest_dir = os.path.dirname(dest_path)
 
@@ -58,13 +70,27 @@ def getDir(url):
 
 
 if __name__ == "__main__":
-    url = sys.argv[1]
+    if ";" in sys.argv[1]:
+        urls = sys.argv[1].split(";")
+    else:
+        urls = [sys.argv[1]]
     script = " ".join(['"%s"' % arg for arg in sys.argv[2:]])
-    target_dir = getDir(url)
-    if "github.com" in url and ".zip" not in url: # Download master brach from github
-        url += "/archive/master.zip"
-    if not os.path.isdir(target_dir):
-        download(url, target_dir)
+    for url in urls:
+        target_dir = getDir(url)
+        if ".zip" not in url:
+            if "github.com" in url:
+                url += "/archive/master.zip"
+            elif "gitlab.com" in url:
+                url += "/repository/archive.zip?ref=master"
+            elif "gogs.io" in url:
+                url += "/archive/master.zip"
+
+        if not os.path.isdir(target_dir):
+            try:
+                download(url, target_dir)
+                break
+            except Exception, err:
+                print "Error downloading from %s: %s" % (url, err)
     print "Starting %s/%s..." % (target_dir, script)
     os.chdir(target_dir)
     os.execv("../Python/python", ["../Python/python", '%s' % script.strip("\"'")])

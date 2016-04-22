@@ -12,5 +12,5 @@ if [ -d "ZeroNet" ]; then
     cd "$(dirname "$0")/ZeroNet"
     ../Python/python $SCRIPT "$@"
 else
-    ./Python/python -m zerobundle.run https://github.com/HelloZeroNet/ZeroNet $SCRIPT "$@"
+    ./Python/python -m zerobundle.run https://github.com/HelloZeroNet/ZeroNet;https://gitlab.com/HelloZeroNet/ZeroNet;https://try.gogs.io/ZeroNet/ZeroNet $SCRIPT "$@"
 fi

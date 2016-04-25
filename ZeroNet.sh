@@ -1,6 +1,6 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-if [ x$DISPLAY != x ] ; then
+if [ x$DISPLAY != x ] || [[ "$OSTYPE" == "darwin"* ]]; then
     # Has gui, open browser
     SCRIPT="start.py"
 else

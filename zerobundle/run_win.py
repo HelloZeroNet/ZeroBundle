@@ -241,6 +241,8 @@ if __name__ == "__main__":
         urls = [sys.argv[1]]
     script = " ".join(['"%s"' % arg for arg in sys.argv[2:]])
 
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)  # Hide console
+
     EnableVisualStyles()
 
     IDC_ARROW = 32512

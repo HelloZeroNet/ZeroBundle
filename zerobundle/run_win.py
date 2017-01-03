@@ -173,7 +173,7 @@ def getDir(url):
 
 def WndProc(hWnd, Msg, wParam, lParam):
     if Msg == WM_CREATE:
-        hWndStatic = ctypes.windll.user32.CreateWindowExW(0, u"Static", 0, WS_CHILD | WS_VISIBLE, 0, 0, 400, 40, hWnd, 1, 0, 0)
+        hWndStatic = ctypes.windll.user32.CreateWindowExW(0, u"Static", 0, WS_CHILD | WS_VISIBLE, 10, 5, 380, 40, hWnd, 1, 0, 0)
         SendMessage(hWndStatic, WM_SETFONT, ctypes.windll.gdi32.GetStockObject(17), False) # DEFAULT_GUI_FONT
         ctypes.windll.user32.CreateWindowExW(0, u"msctls_progress32", 0, WS_CHILD | WS_VISIBLE, 0, 50, 400, 20, hWnd, 2, 0, 0)
     elif Msg == WM_DESTROY:

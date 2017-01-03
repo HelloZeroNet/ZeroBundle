@@ -1,13 +1,17 @@
 @echo off
 cd /d "%~dp0"
-if "%1" == "" (
-	Python\python.exe -m zerobundle.run https://github.com/HelloZeroNet/ZeroNet;https://gitlab.com/HelloZeroNet/ZeroNet;https://try.gogs.io/ZeroNet/ZeroNet start.py
-) else (
-	if not exist ZeroNet (
-		Python\python.exe -m zerobundle.run https://github.com/HelloZeroNet/ZeroNet;https://gitlab.com/HelloZeroNet/ZeroNet;https://try.gogs.io/ZeroNet/ZeroNet zeronet.py %*
+if not exist ZeroNet (
+	if "%1" == "" (
+		Python\python.exe -m zerobundle.run_win https://github.com/HelloZeroNet/ZeroNet;https://gitlab.com/HelloZeroNet/ZeroNet;https://try.gogs.io/ZeroNet/ZeroNet start.py
 	) else (
-		cd ZeroNet
-		..\Python\python.exe zeronet.py %*
-		cd ..
+		Python\python.exe -m zerobundle.run_win https://github.com/HelloZeroNet/ZeroNet;https://gitlab.com/HelloZeroNet/ZeroNet;https://try.gogs.io/ZeroNet/ZeroNet zeronet.py %*
 	)
+) else (
+	cd ZeroNet
+	if "%1" == "" (
+		..\Python\python.exe start.py
+	) else (
+		..\Python\python.exe zeronet.py %*
+	)
+	cd ..
 )

@@ -42,6 +42,52 @@ SetWindowLong = ctypes.windll.user32.SetWindowLongW
 SetWindowLong.restype = ctypes.wintypes.LONG
 SetWindowLong.argtypes = [ctypes.wintypes.HWND, ctypes.c_int, ctypes.wintypes.LONG]
 
+SystemParametersInfo = ctypes.windll.user32.SystemParametersInfoW
+SystemParametersInfo.restype = ctypes.wintypes.BOOL
+SystemParametersInfo.argtypes = [ctypes.wintypes.UINT, ctypes.wintypes.UINT, ctypes.wintypes.LPVOID, ctypes.wintypes.UINT]
+
+LF_FACESIZE = 32
+class LOGFONT(ctypes.Structure):
+    _fields_ = [("lfHeight", ctypes.wintypes.LONG),
+                ("lfWidth", ctypes.wintypes.LONG),
+                ("lfEscapement", ctypes.wintypes.LONG),
+                ("lfOrientation", ctypes.wintypes.LONG),
+                ("lfWeight", ctypes.wintypes.LONG),
+                ("lfItalic", ctypes.wintypes.BYTE),
+                ("lfUnderline", ctypes.wintypes.BYTE),
+                ("lfStrikeOut", ctypes.wintypes.BYTE),
+                ("lfCharSet", ctypes.wintypes.BYTE),
+                ("lfOutPrecision", ctypes.wintypes.BYTE),
+                ("lfClipPrecision", ctypes.wintypes.BYTE),
+                ("lfQuality", ctypes.wintypes.BYTE),
+                ("lfPitchAndFamily", ctypes.wintypes.BYTE),
+                ("lfFaceName", ctypes.wintypes.WCHAR * LF_FACESIZE),]
+
+CreateFontIndirect = ctypes.windll.gdi32.CreateFontIndirectW
+CreateFontIndirect.restype = ctypes.wintypes.HFONT
+CreateFontIndirect.argtypes = [ctypes.POINTER(LOGFONT)]
+
+SPI_GETNONCLIENTMETRICS = 0x0029
+class NONCLIENTMETRICS(ctypes.Structure):
+    def __init__(self, *args, **kwargs):
+        super(NONCLIENTMETRICS, self).__init__(*args, **kwargs)
+        self.cbSize = ctypes.sizeof(self)
+    _fields_ = [("cbSize", ctypes.wintypes.UINT),
+                ("iBorderWidth", ctypes.c_int),
+                ("iScrollWidth", ctypes.c_int),
+                ("iScrollHeight", ctypes.c_int),
+                ("iCaptionWidth", ctypes.c_int),
+                ("iCaptionHeight", ctypes.c_int),
+                ("lfCaptionFont", LOGFONT),
+                ("iSmCaptionWidth", ctypes.c_int),
+                ("iSmCaptionHeight", ctypes.c_int),
+                ("lfSmCaptionFont", LOGFONT),
+                ("iMenuWidth", ctypes.c_int),
+                ("iMenuHeight", ctypes.c_int),
+                ("lfMenuFont", LOGFONT),
+                ("lfStatusFont", LOGFONT),
+                ("lfMessageFont", LOGFONT)]
+
 WM_CREATE = 0x0001
 WM_DESTROY = 0x0002
 WM_SETFONT = 0x0030
@@ -75,7 +121,7 @@ class WNDCLASSEX(ctypes.Structure):
                 ("hInstance", ctypes.wintypes.HINSTANCE),
                 ("hIcon", ctypes.wintypes.HICON),
                 ("hCursor", ctypes.wintypes.HICON),
-                ("hBrush", ctypes.wintypes.HBRUSH),
+                ("hbrBackground", ctypes.wintypes.HBRUSH),
                 ("lpszMenuName", ctypes.wintypes.LPCWSTR),
                 ("lpszClassName", ctypes.wintypes.LPCWSTR),
                 ("hIconSm", ctypes.wintypes.HICON)]
@@ -173,9 +219,26 @@ def getDir(url):
 
 def WndProc(hWnd, Msg, wParam, lParam):
     if Msg == WM_CREATE:
-        hWndStatic = ctypes.windll.user32.CreateWindowExW(0, u"Static", 0, WS_CHILD | WS_VISIBLE, 10, 5, 380, 40, hWnd, 1, 0, 0)
-        SendMessage(hWndStatic, WM_SETFONT, ctypes.windll.gdi32.GetStockObject(17), False) # DEFAULT_GUI_FONT
-        ctypes.windll.user32.CreateWindowExW(0, u"msctls_progress32", 0, WS_CHILD | WS_VISIBLE, 0, 50, 400, 20, hWnd, 2, 0, 0)
+        rect = ctypes.wintypes.RECT()
+        ctypes.windll.user32.GetClientRect(hWnd, ctypes.pointer(rect))
+
+        width = 480
+        height = 60
+        hWndStatic = ctypes.windll.user32.CreateWindowExW(0, u"Static", 0, WS_CHILD | WS_VISIBLE, (rect.right / 2) - (width / 2), 20, width, height, hWnd, 1, 0, 0)
+
+        # GetStockObject does not get the "true" font, use SystemParametersInfo SPI_GETNONCLIENTMETRICS.
+        hFont = 0
+        ncm = NONCLIENTMETRICS()
+        ret = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ctypes.sizeof(NONCLIENTMETRICS), ctypes.pointer(ncm), 0)
+        if ret:
+            hFont = CreateFontIndirect(ctypes.pointer(ncm.lfMessageFont))
+        else:
+            hFont = ctypes.windll.gdi32.GetStockObject(17) # DEFAULT_GUI_FONT
+
+        SendMessage(hWndStatic, WM_SETFONT, hFont, False)
+
+        width = 480
+        ctypes.windll.user32.CreateWindowExW(0, u"msctls_progress32", 0, WS_CHILD | WS_VISIBLE, (rect.right / 2) - (width / 2), 70, width, 20, hWnd, 2, 0, 0)
     elif Msg == WM_DESTROY:
         cancelled = True
         ctypes.windll.user32.PostQuitMessage(0)
@@ -213,7 +276,7 @@ def EnableVisualStyles():
         actCtx.lpResourceName = 124
 
         ulpActivationCookie = ctypes.c_int()
-        ret = ctypes.windll.kernel32.ActivateActCtx(ctypes.windll.kernel32.CreateActCtxW(ctypes.pointer(actCtx)), ctypes.pointer(ulpActivationCookie))
+        ctypes.windll.kernel32.ActivateActCtx(ctypes.windll.kernel32.CreateActCtxW(ctypes.pointer(actCtx)), ctypes.pointer(ulpActivationCookie))
 
 def downloadThread():
     global target_dir
@@ -257,8 +320,8 @@ if __name__ == "__main__":
     SM_CYSCREEN = 1
     screenWidth = ctypes.windll.user32.GetSystemMetrics(SM_CXSCREEN)
     screenHeight = ctypes.windll.user32.GetSystemMetrics(SM_CYSCREEN)
-    width = 400
-    height = 100
+    width = 500
+    height = 130
 
     hWnd = ctypes.windll.user32.CreateWindowExW(0, u"ZeroNet", u"ZeroNet", WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, (screenWidth / 2) - (width / 2), (screenHeight / 2) - (height / 2), width, height, 0, 0, 0, 0)
     if hWnd == 0:

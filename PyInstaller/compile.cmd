@@ -14,7 +14,9 @@ rmdir /S /Q dist\ZeroNet\core\.git
 rem powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('dist/ZeroNet', '../dist/ZeroNet-win.zip'); }"
 ..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe /va /s desc "ZeroNet"
 ..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe /s name "ZeroNet client"
+..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe /s product "ZeroNet client"
 ..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe /s copyright "2017 ZeroNet.io"
+..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe /s productver "0.5.1.0"
 ..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe /s company "Open Source Developer, Tamas Kocsis"
 ..\..\tools\verpatch.exe dist\ZeroNet\ZeroNet.exe 0.5.1.0
 rem ..\..\tools\mt.exe -nologo -manifest "dist\ZeroNet\ZeroNet.exe.manifest" -outputresource:"dist\ZeroNet\ZeroNet.exe;1"

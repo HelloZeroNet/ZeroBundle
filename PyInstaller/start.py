@@ -5,10 +5,15 @@
 import sys
 import os
 
-# Add Windows exe source directories
-start_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(start_dir, "lib"))
-sys.path.insert(0, os.path.join(start_dir, "core"))
+if getattr(sys, 'frozen', False):
+    start_dir = os.path.dirname(sys.executable)
+elif __file__:
+    start_dir = os.path.dirname(__file__)
+
+os.chdir(start_dir)  # Change the working dir
+
+sys.path.insert(0, os.path.join(start_dir, "lib"))  # External modules
+sys.path.insert(0, os.path.join(start_dir, "core"))  # ZeroNet source code
 
 # For best compatibility copy required dlls to lib dir
 if os.path.isfile(start_dir + "\\msvcr90.dll") and not os.path.isfile(start_dir + "\\lib\\msvcr90.dll"):

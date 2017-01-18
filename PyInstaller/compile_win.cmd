@@ -1,6 +1,6 @@
 rmdir /S /Q build
 rmdir /S /Q dist
-C:\Python27\scripts\pyinstaller.exe zeronet.spec -y
+C:\Python27\scripts\pyinstaller.exe zeronet_win.spec -y
 rmdir /S /Q dist\ZeroNet\Include
 mkdir dist\ZeroNet\core
 mkdir dist\ZeroNet\lib

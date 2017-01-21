@@ -6,7 +6,7 @@ block_cipher = None
 sys.modules['FixTk'] = None
 
 a = Analysis(
-    ['start.py'],
+    ['boot.py'],
     pathex=[],
     binaries=None,
     datas=None,

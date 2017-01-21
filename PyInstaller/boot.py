@@ -29,6 +29,7 @@ def addSourcePaths(work_dir):
     if sys.platform == "darwin":
         sys.path.append(work_dir + "/core")  # Updated source
         sys.path.append(os.path.abspath(os.path.dirname(sys.executable) + "/../Resources/core"))  # Packed-in source
+        sys.source_update_dir = work_dir + "/core"  # Updated source code should be put here
     else:
         sys.path.insert(0, os.path.join(work_dir, "lib"))  # External modules
         sys.path.insert(0, os.path.join(work_dir, "core"))  # ZeroNet source code
@@ -94,6 +95,7 @@ class ExitCommand(Exception):
 
 
 def signalHandler(signal, frame):
+    print signal, frame
     raise ExitCommand()
 
 

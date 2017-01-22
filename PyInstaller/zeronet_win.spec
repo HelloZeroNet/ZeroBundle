@@ -24,21 +24,35 @@ pyz = PYZ(
     cipher=block_cipher
 )
 
-exe = EXE(
+exe_gui = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
+    append_pkg=False,
     name='ZeroNet',
     debug=False,
     strip=False,
     upx=True,
     icon="zeronet.ico",
-    console=True,
-    version_file="version.txt"
+    console=False
+)
+
+exe_cli = EXE(
+    pyz,
+    a.scripts,
+    exclude_binaries=True,
+    append_pkg=False,
+    name='ZeroNet-cli',
+    debug=False,
+    strip=False,
+    upx=True,
+    icon="zeronet.ico",
+    console=True
 )
 
 coll = COLLECT(
-    exe,
+    exe_gui,
+    exe_cli,
     a.binaries,
     a.zipfiles,
     a.datas,

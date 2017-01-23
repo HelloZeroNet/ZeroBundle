@@ -99,8 +99,9 @@ def signalHandler(signal, frame):
     raise ExitCommand()
 
 
-def main(mode="main"):
-    sys.argv = [sys.argv[0]] + ["--open_browser", "default_browser"] + sys.argv[1:]  # Open browser window
+def main(mode="main", open_browser=True):
+    if open_browser:
+        sys.argv = [sys.argv[0]] + ["--open_browser", "default_browser"] + sys.argv[1:]  # Open browser window
 
     if mode == "thread":
         # Manipulate sys.exit to send exit signal before killing the thread
@@ -130,7 +131,7 @@ if __name__ == '__main__':
         signal.signal(signal.SIGUSR1, signalHandler)
         # Start dock icon click watcher on macOS
         from threading import Thread
-        t = Thread(target=main, kwargs={"mode": "thread"})
+        t = Thread(target=main, kwargs={"mode": "thread", "open_browser": not os.environ.get("SECURITYSESSIONID")})
         t.daemon = True
         t.start()
 

@@ -16,4 +16,4 @@ rm dist/ZeroNet.app/Contents/Resources/core/src/lib/opensslVerify/ssleay32.dll
 rm dist/ZeroNet.app/Contents/Resources/core/src/lib/opensslVerify/openssl.exe
 rm ZeroNet.pkg
 echo "Signing..."
-codesign --verbose=3 --force --deep --sign "Developer ID Application: Tamas Kocsis (4977YF9Q3Z)" dist/ZeroNet.app/
+#codesign --verbose=3 --force --deep --sign "Developer ID Application: Tamas Kocsis (4977YF9Q3Z)" dist/ZeroNet.app/

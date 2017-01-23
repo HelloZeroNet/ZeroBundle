@@ -24,12 +24,28 @@ def getWorkDir():
     return work_dir
 
 
+# Get revision from Config.py file
+def getRev(file_path):
+    import re
+    try:
+        config_data = open(file_path).read(1024)
+        rev = re.search("rev = ([0-9]+)", config_data).group(1)
+        return int(rev)
+    except Exception:
+        return -1
+
+
 # ZeroNet source paths
 def addSourcePaths(work_dir):
     if sys.platform == "darwin":
-        sys.path.append(work_dir + "/core")  # Updated source
-        sys.path.append(os.path.abspath(os.path.dirname(sys.executable) + "/../Resources/core"))  # Packed-in source
-        sys.source_update_dir = work_dir + "/core"  # Updated source code should be put here
+        source_packed_dir = os.path.normpath(os.path.abspath(os.path.dirname(sys.executable)) + "/../Resources/core")
+        source_update_dir = work_dir + "/core"
+
+        if getRev(source_update_dir + "/src/Config.py") > getRev(source_packed_dir + "/src/Config.py"):
+            sys.path.append(source_update_dir)  # Updated source
+
+        sys.path.append(source_packed_dir)  # Packed-in source
+        sys.source_update_dir = source_update_dir  # Updated source code should be put here
     else:
         sys.path.insert(0, os.path.join(work_dir, "lib"))  # External modules
         sys.path.insert(0, os.path.join(work_dir, "core"))  # ZeroNet source code
@@ -95,7 +111,6 @@ class ExitCommand(Exception):
 
 
 def signalHandler(signal, frame):
-    print signal, frame
     raise ExitCommand()
 
 
@@ -106,6 +121,7 @@ def main(mode="main", open_browser=True):
     if mode == "thread":
         # Manipulate sys.exit to send exit signal before killing the thread
         sys_exit = sys.exit
+
         def threadedExit(*args):
             if gui_root:
                 gui_root.destroy()

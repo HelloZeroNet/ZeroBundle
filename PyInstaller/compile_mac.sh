@@ -7,6 +7,8 @@ cd -
 git clone --depth 1 file://$(pwd)/../../ZeroNet/.git dist/ZeroNet.app/Contents/Resources/core
 mv dist/ZeroNet.app/Contents/MacOS/ZeroNet.pkg dist/ZeroNet.app/Contents/Resources/ZeroNet.pkg
 ln -s ../Resources/ZeroNet.pkg dist/ZeroNet.app/Contents/MacOS/ZeroNet.pkg
+echo "Copy static built pyexpat"
+cp -f tools/pyexpat.so dist/ZeroNet.app/Contents/MacOS/pyexpat.so
 echo "Cleanup..."
 rm dist/ZeroNet.app/Contents/MacOS/include
 rm dist/ZeroNet.app/Contents/MacOS/lib

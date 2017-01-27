@@ -1,3 +1,4 @@
+rm ../../ZeroNet-mac/.DS_Store
 rm -Rfv ../../ZeroNet-mac/ZeroNet.app/Contents/Resources/core
 cp -fv dist/ZeroNet.app/Contents/MacOS/ZeroNet ../../ZeroNet-mac/ZeroNet.app/Contents/MacOS/ZeroNet
 cp -Rv dist/ZeroNet.app/Contents/Resources/core ../../ZeroNet-mac/ZeroNet.app/Contents/Resources/

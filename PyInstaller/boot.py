@@ -8,7 +8,7 @@ def getWorkDir():
     if getattr(sys, 'frozen', False):
         work_dir = os.path.dirname(os.path.abspath(sys.executable))  # Normally next to .exe
 
-        if work_dir.startswith("/Application") or work_dir.startswith("/private"):
+        if work_dir.startswith("/Application") or work_dir.startswith("/private") or work_dir.startswith(os.path.expanduser("~/Library")):
             # In Applcation Support
             work_dir = os.path.expanduser("~/Library/Application Support/ZeroNet")
             if not os.path.isdir(work_dir):

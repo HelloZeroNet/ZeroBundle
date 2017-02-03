@@ -64,6 +64,25 @@ def copyDlls(work_dir):
 
 def setup():
     work_dir = getWorkDir()
+
+    # Redirect stdout to file if running as .app
+    if sys.platform == "darwin" and not sys.stdout.isatty() and os.path.isdir(work_dir + "/log"):
+        print "Running as .app", sys.argv
+        try:
+            sys.stdout = open(work_dir + "/log/stdout.log", "w")
+            sys.stderr = sys.stdout
+        except Exception, err:
+            print "Error redirecting stdout:", err
+
+    # Remove weird -psn_ argument
+    if len(sys.argv) > 1 and sys.argv[1].startswith('-psn_'):
+        del sys.argv[1]
+
+    # Replace boot.py with the real executable
+    if sys.argv[0].endswith("Resources/boot.py"):
+        sys.argv[0] = sys.argv[0].replace("Resources/boot.py", "MacOS/ZeroNet")
+        sys.executable = sys.argv[0]
+
     addSourcePaths(work_dir)
     if sys.platform.startswith("win"):
         copyDlls(work_dir)
@@ -77,12 +96,14 @@ import zeronet
 
 gui_root = None
 
-
 def gui():
     global gui_root
-    time.sleep(5)
     sys.path.append("/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk")
     sys.path.append("/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload/")
+
+    # Wait for ui_server startup
+    while not (sys.modules.get("main") and "ui_server" in dir(sys.modules["main"]) and getattr(sys.modules["main"].ui_server, "server", None)):
+        time.sleep(0.1)
 
     def click():
         import webbrowser
@@ -97,6 +118,8 @@ def gui():
         gui_root.iconify()
         gui_root.createcommand('tk::mac::ReopenApplication', click)
         gui_root.createcommand('tk::mac::Quit', quit)
+        if not os.environ.get("SECURITYSESSIONID"):  # Not started by auto-run
+            click()
         gui_root.mainloop()
     except ExitCommand:
         print "Stopping..."
@@ -112,6 +135,7 @@ class ExitCommand(Exception):
 
 def signalHandler(signal, frame):
     raise ExitCommand()
+
 
 
 def main(mode="main", open_browser=True):
@@ -145,13 +169,13 @@ if __name__ == '__main__':
     if sys.platform == "darwin":
         import signal
         signal.signal(signal.SIGUSR1, signalHandler)
-        # Start dock icon click watcher on macOS
         from threading import Thread
-        t = Thread(target=main, kwargs={"mode": "thread", "open_browser": not os.environ.get("SECURITYSESSIONID")})
+        t = Thread(target=main, kwargs={"mode": "thread", "open_browser": False})
         t.daemon = True
         t.start()
 
         try:
+            # Start dock icon click watcher on macOS
             gui()
         except ExitCommand:
             pass

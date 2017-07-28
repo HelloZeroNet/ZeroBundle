@@ -166,7 +166,7 @@ def main(mode="main", open_browser=True):
 
 
 if __name__ == '__main__':
-    if sys.platform == "darwin":
+    if sys.platform == "darwin" and len(sys.argv) <= 1:
         import signal
         signal.signal(signal.SIGUSR1, signalHandler)
         from threading import Thread

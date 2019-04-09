@@ -1,0 +1,10 @@
+#!/bin/sh
+mkdir $HOME/.zeronet
+chown $SUDO_USER:$SUDO_USER $HOME/.zeronet
+
+cat > $HOME/.zeronet/zeronet.conf << EOF
+[global]
+data_dir = $HOME/.zeronet/
+EOF
+
+chown $SUDO_USER:$SUDO_USER $HOME/.zeronet/zeronet.conf

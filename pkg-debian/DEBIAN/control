@@ -1,0 +1,8 @@
+Package: ZeroNet
+Version: 0.6.5
+Architecture: all
+Essential: no
+Section: web
+Priority: optional
+Maintainer: Nofish
+Description: Zeronet.

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=0.6.5
+Name=ZeroNet
+Comment=ZeroNet browser is a dedicated browser for ZeroNet protocol.
+Exec=sh -c "python3 /usr/share/ZeroNet/start.py --config_file \\$HOME/.zeronet/zeronet.conf"
+Path=/usr/share/ZeroNet/
+Icon=zeronet-logo
+Terminal=true
+Type=Application
+Categories=Application;Network;
